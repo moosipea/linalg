@@ -2,4 +2,5 @@
 
 CC=gcc
 CFLAGS="-Wall -Wextra -pedantic -std=c99"
-$CC $CFLAGS -lm -o main main.c linalg.c
+SOURCES=$(find ./src/*.c -printf "%p ")
+$CC $CFLAGS -lm -o main $SOURCES
