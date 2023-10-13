@@ -3,31 +3,44 @@
 #include <stdio.h>
 
 #define MODEL_MAGIC 0X2E4D444C /* ".MDL" */
+#define MODEL_INT_COUNT 5
 
 struct ModelHeader {
-    int magic;
-    int vertices_count;
-    int indices_count;
-    int vertices_offset;
-    int indices_offset;
+    uint32_t magic;
+    uint32_t vertices_count;
+    uint32_t indices_count;
+    uint32_t vertices_offset;
+    uint32_t indices_offset;
 };
 
-void game_Model_load(const char *path) {
+bool game_Model_load(const char *path, struct game_Model *out) {
     FILE *fp = fopen(path, "r");
 
     if (!fp) {
         printf("File %s could not be opened!\n", path);
-        return;
+        return false;
     }
 
     struct ModelHeader header;
-    fread((void *)&header, sizeof(header) / 5, 5, fp);
+    fread((void *)&header, sizeof(header) / MODEL_INT_COUNT, MODEL_INT_COUNT, fp);
 
-    printf("magic = %s\n", (char *)&header.magic);
-    printf("vertices_count = %d\n", header.vertices_count);
-    printf("indices_count = %d\n", header.indices_count);
-    printf("vertices_offset = %d\n", header.vertices_offset);
-    printf("indices_offset = %d\n", header.indices_offset);
+	if (header.magic != MODEL_MAGIC) {
+		printf("Invalid model file!\n");
+		fclose(fp);
+		return false;
+	}
+	
+	out->vertices_count = header.vertices_count;
+	out->indices_count = header.indices_count;
+	
+	out->vertices = calloc(header.vertices_count, sizeof(float));
+	fseek(fp, header.vertices_offset, SEEK_SET);
+	fread(out->vertices, sizeof(float), header.vertices_count, fp);
+	
+	out->indices = calloc(header.indices_count, sizeof(uint32_t));
+	fseek(fp, header.indices_offset, SEEK_SET);
+	fread(out->vertices, sizeof(uint32_t), header.indices_count, fp);
 
     fclose(fp);
+	return true;
 }

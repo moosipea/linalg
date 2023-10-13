@@ -2,16 +2,19 @@
 #define GAME_H
 
 #include <stdlib.h>
+#include <stdbool.h>
+#include <stdint.h>
 /* #include <GLFW/glfw3.h> */
 
-struct Model {
-	size_t vertex_count;
-	size_t index_count;
+/* TODO: should use size_t */
+struct game_Model {
+	uint32_t vertices_count;
+	uint32_t indices_count;
 	float *vertices;
-	size_t *indices;
+	uint32_t *indices;
 };
 
-void game_Model_load(const char *path);
+bool game_Model_load(const char *path, struct game_Model *out);
 
 /* struct game_Game {
 }; */
