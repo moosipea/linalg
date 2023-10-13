@@ -82,8 +82,8 @@ void linalg_Mat4x4_matmul(struct linalg_Mat4x4 *with, struct linalg_Mat4x4 *mat)
 struct linalg_Mat4x4 linalg_Mat4x4_translation(float dx, float dy, float dz) {
     struct linalg_Mat4x4 mat = linalg_Mat4x4_ident();
     mat.m[0][3] = dx;
-    mat.m[1][3] = dy;
-    mat.m[2][3] = dz;
+    mat.m[1][3] = dx;
+    mat.m[2][3] = dx;
     return mat;
 }
 
