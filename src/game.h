@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
+
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "linalg.h"

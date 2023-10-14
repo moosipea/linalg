@@ -1,6 +1,5 @@
 #include "game.h"
 
-#include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -12,15 +11,15 @@ static void panic(char *why) {
     exit(EXIT_FAILURE);
 }
 
-struct ModelHeader {
-    u32 magic;
-    u32 vertices_count;
-    u32 indices_count;
-    u32 vertices_offset;
-    u32 indices_offset;
-};
-
 bool game_Model_load(const char *path, struct game_Model *out) {
+	struct ModelHeader {
+    	u32 magic;
+    	u32 vertices_count;
+    	u32 indices_count;
+    	u32 vertices_offset;
+    	u32 indices_offset;
+	} header;
+
     FILE *fp = fopen(path, "r");
 
     if (!fp) {
@@ -28,7 +27,6 @@ bool game_Model_load(const char *path, struct game_Model *out) {
         return false;
     }
 
-    struct ModelHeader header;
     fread((void *)&header, sizeof(header) / MODEL_INT_COUNT, MODEL_INT_COUNT, fp);
 
     if (header.magic != MODEL_MAGIC) {
@@ -72,7 +70,8 @@ static GLFWwindow *create_window(u32 width, u32 height, char *title) {
 
 static void cleanup_game(struct game_Game *game) { glfwTerminate(); }
 
-static void debug_render() { /* TODO */
+static void debug_render() {
+	
 }
 
 int game_Game_run(struct game_Game *game, struct game_Options opts) {
@@ -82,7 +81,17 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
     game->window = create_window(opts.start_width, opts.start_height, opts.title);
     glfwSwapInterval(1);
 
+	float vertices[] = {
+		-0.5f, -0.5f, 0.0f,
+		 0.5f, -0.5f, 0.0f,
+		 0.0f,  0.5f, 0.0f
+	};
+
+	u32 vbo;
+	glGenBuffers(1, &vbo);
+
     while (!glfwWindowShouldClose(game->window)) {
+		glViewport(0, 0, opts.start_width, opts.start_height);
         glClearColor(0.5f, 0.0f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         debug_render();
