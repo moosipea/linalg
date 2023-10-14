@@ -19,6 +19,7 @@ struct game_Model {
 };
 
 bool game_Model_load(const char *path, struct game_Model *out);
+void game_Model_kill(struct game_Model *model);
 
 struct game_Transform {
 	struct linalg_Vec3 translation;
@@ -41,7 +42,7 @@ int game_Game_run(struct game_Game *game, struct game_Options opts);
 
 enum game_ActorEvent {
 	ACTOREVENT_TICK,
-	ACTOREVENT_DELETE,
+	ACTOREVENT_KILL,
 };
 
 struct game_Actor;

@@ -2,16 +2,22 @@
 
 #include <GLFW/glfw3.h>
 #include <stdio.h>
+#include <string.h>
 
-#define MODEL_MAGIC 0X2E4D444C /* ".MDL" */
+#define MODEL_MAGIC 0x4C444D2E
 #define MODEL_INT_COUNT 5
 
+static void panic(char *why) {
+	fprintf(stderr, "PANIC: %s\n", why);
+	exit(EXIT_FAILURE);
+}
+
 struct ModelHeader {
-    uint32_t magic;
-    uint32_t vertices_count;
-    uint32_t indices_count;
-    uint32_t vertices_offset;
-    uint32_t indices_offset;
+    u32 magic;
+    u32 vertices_count;
+    u32 indices_count;
+    u32 vertices_offset;
+    u32 indices_offset;
 };
 
 bool game_Model_load(const char *path, struct game_Model *out) {
@@ -26,6 +32,7 @@ bool game_Model_load(const char *path, struct game_Model *out) {
     fread((void *)&header, sizeof(header) / MODEL_INT_COUNT, MODEL_INT_COUNT, fp);
 
 	if (header.magic != MODEL_MAGIC) {
+		printf("Magic: %x\n", header.magic);
 		printf("Invalid model file!\n");
 		fclose(fp);
 		return false;
@@ -34,21 +41,25 @@ bool game_Model_load(const char *path, struct game_Model *out) {
 	out->vertices_count = header.vertices_count;
 	out->indices_count = header.indices_count;
 	
-	out->vertices = calloc(header.vertices_count, sizeof(float));
-	fseek(fp, header.vertices_offset, SEEK_SET);
-	fread(out->vertices, sizeof(float), header.vertices_count, fp);
-	
-	out->indices = calloc(header.indices_count, sizeof(uint32_t));
-	fseek(fp, header.indices_offset, SEEK_SET);
-	fread(out->vertices, sizeof(uint32_t), header.indices_count, fp);
+	/* I think the bytes are not actually being copied */
 
+	printf("vertices_offset: %d\n", header.vertices_offset);
+	out->vertices = calloc(header.vertices_count, sizeof(float));
+	
+	fseek(fp, header.vertices_offset, SEEK_SET);
+	fread(out->vertices, sizeof(f32), header.vertices_count, fp);
+	
+	out->indices = calloc(header.indices_count, sizeof(u32));
+	fseek(fp, header.indices_offset, SEEK_SET);
+	fread(out->indices, sizeof(u32), header.indices_count, fp);
+	
     fclose(fp);
 	return true;
 }
 
-static void panic(char *why) {
-	fprintf(stderr, "PANIC: %s\n", why);
-	exit(EXIT_FAILURE);
+void game_Model_kill(struct game_Model *model) {
+	free(model->vertices);
+	free(model->indices);
 }
 
 static GLFWwindow *create_window(u32 width, u32 height, char *title) {	
