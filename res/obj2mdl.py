@@ -45,6 +45,8 @@ file_name = sys.argv[1]
 
 with open(os.path.splitext(file_name)[0] + ".mdl", "wb") as f:
     vertices, indices = parse_obj(file_name)
-    write_header(f, len(vertices), len(indices), HEADER_SIZE, HEADER_SIZE + len(vertices))
+    print(f"Vertices: {vertices}")
+    print(f"Indices: {indices}")
+    write_header(f, len(vertices), len(indices), HEADER_SIZE, HEADER_SIZE + len(vertices) * 4)
     [f.write(struct.pack("f", v)) for v in vertices]
     [f.write(i.to_bytes(4, byteorder="little")) for i in indices]

@@ -3,13 +3,13 @@
 
 static void print_vertices(f32 *vertices, u32 n) {
 	for (u32 i = 0; i < n; i++) {
-		printf("%f\n", vertices[n]);
+		printf("%f\n", vertices[i]);
 	}
 }
 
 static void print_indices(u32 *indices, u32 n) {
 	for (u32 i = 0; i < n; i++) {
-		printf("%d\n", indices[n]);
+		printf("%d\n", indices[i]);
 	}
 }
 
@@ -26,6 +26,7 @@ int main(void) {
 		return EXIT_FAILURE;
 
 	print_vertices(mdl.vertices, mdl.vertices_count);
+	printf("FIRST: %d\n", mdl.indices[0]);
 	print_indices(mdl.indices, mdl.indices_count);
 
 	game_Model_kill(&mdl);
