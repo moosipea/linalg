@@ -3,15 +3,12 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include <stdint.h>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "common.h"
 #include "linalg.h"
-
-typedef uint32_t u32;
-typedef float f32;
 
 struct game_Model {
 	u32 vertices_count;

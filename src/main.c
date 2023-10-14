@@ -10,6 +10,8 @@ int main(void) {
 	};
 
 	game_Game_run(&game, opts);
+	
+	PANIC("Example panic! width = %d", opts.start_width);
 
     return EXIT_SUCCESS;
 }

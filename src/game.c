@@ -6,11 +6,6 @@
 #define MODEL_MAGIC 0x4C444D2E
 #define MODEL_INT_COUNT 5
 
-static void panic(char *why) {
-    fprintf(stderr, "PANIC: %s\n", why);
-    exit(EXIT_FAILURE);
-}
-
 bool game_Model_load(const char *path, struct game_Model *out) {
 	struct ModelHeader {
     	u32 magic;
@@ -57,32 +52,41 @@ void game_Model_kill(struct game_Model *model) {
 }
 
 static GLFWwindow *create_window(u32 width, u32 height, char *title) {
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     GLFWwindow *window = glfwCreateWindow(width, height, title, NULL, NULL);
 
     if (!window) {
         glfwTerminate();
-        panic("Failed to create window!");
+        PANIC("Failed to create window!");
     }
 
     glfwMakeContextCurrent(window);
     return window;
 }
 
-static void cleanup_game(struct game_Game *game) {
+static void cleanup_game(struct game_Game *_game) {
 	glfwTerminate();
 }
 
-static void debug_render() {
+static void debug_render(void) {
 	
 }
 
 int game_Game_run(struct game_Game *game, struct game_Options opts) {
-    if (!glfwInit())
-        return EXIT_FAILURE;
+	if (!glfwInit())
+		PANIC("Failed to initialize GLFW");
 
     game->window = create_window(opts.start_width, opts.start_height, opts.title);
+	
+	/* Initialize OpenGL */
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) 
+		PANIC("Failed to initialize GLAD");
+
     glfwSwapInterval(1);
 
+	/* OpenGL begin */
 	float vertices[] = {
 		-0.5f, -0.5f, 0.0f,
 		 0.5f, -0.5f, 0.0f,
@@ -91,6 +95,10 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
 
 	u32 vbo;
 	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	/* OpenGL end */
 
     while (!glfwWindowShouldClose(game->window)) {
 		glViewport(0, 0, opts.start_width, opts.start_height);
