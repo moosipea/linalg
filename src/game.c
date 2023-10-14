@@ -67,6 +67,10 @@ static void cleanup_game(struct game_Game *game) {
 	glfwTerminate();
 }
 
+static void debug_render() {
+	/* TODO */
+}
+
 int game_Game_run(struct game_Game *game, struct game_Options opts) {
 	if (!glfwInit())
 		return EXIT_FAILURE;
@@ -75,8 +79,11 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
 	glfwSwapInterval(1);
 
 	while (!glfwWindowShouldClose(game->window)) {
-		glfwPollEvents();
+		glClearColor(0.5f, 0.0f, 0.5f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		debug_render();
 		glfwSwapBuffers(game->window);
+		glfwPollEvents();
 	}
 
 	cleanup_game(game);
