@@ -44,3 +44,29 @@ bool game_Model_load(const char *path, struct game_Model *out) {
     fclose(fp);
 	return true;
 }
+
+static void panic(char *why) {
+	fprintf(stderr, "PANIC: %s\n", why);
+	exit(EXIT_FAILURE);
+}
+
+static GLFWwindow *create_window(u32 width, u32 height, char *title) {	
+	GLFWwindow *window = glfwCreateWindow(width, height, title, NULL, NULL);	
+
+	if (!window) {
+		glfwTerminate();
+		panic("Failed to create window!");
+	}
+	
+	glfwMakeContextCurrent(window);
+	return window;
+}
+
+int game_Game_run(struct game_Game *game, struct game_Options opts) {
+	if (!glfwInit())
+		return EXIT_FAILURE;
+
+	game->window = create_window(opts.start_width, opts.start_height, opts.title);
+
+	return EXIT_SUCCESS;
+}
