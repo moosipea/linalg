@@ -1,7 +1,7 @@
 CC := gcc
 INCLUDES := -Isrc/glad/include
 LIBS := -lm `pkg-config --static --libs glfw3` `pkg-config --libs opengl`
-CFLAGS := $(INCLUDES) $(LIBS)
+CFLAGS := -Wall -Wextra -pedantic -std=c99 $(INCLUDES) $(LIBS)
 
 build: main.o game.o glad.o linalg.o
 	$(CC) $(CFLAGS) main.o game.o glad.o linalg.o
