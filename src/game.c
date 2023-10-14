@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include <GLFW/glfw3.h>
 #include <stdio.h>
 
 #define MODEL_MAGIC 0X2E4D444C /* ".MDL" */
@@ -62,11 +63,23 @@ static GLFWwindow *create_window(u32 width, u32 height, char *title) {
 	return window;
 }
 
+static void cleanup_game(struct game_Game *game) {
+	glfwTerminate();
+}
+
 int game_Game_run(struct game_Game *game, struct game_Options opts) {
 	if (!glfwInit())
 		return EXIT_FAILURE;
 
 	game->window = create_window(opts.start_width, opts.start_height, opts.title);
+	glfwSwapInterval(1);
+
+	while (!glfwWindowShouldClose(game->window)) {
+		glfwPollEvents();
+		glfwSwapBuffers(game->window);
+	}
+
+	cleanup_game(game);
 
 	return EXIT_SUCCESS;
 }

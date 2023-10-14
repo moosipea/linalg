@@ -2,10 +2,14 @@
 #include <stdio.h>
 
 int main(void) {
-	struct game_Model model;
-	if (!game_Model_load("res/out.mdl", &model)) {
-		printf("Failed to load model!\n");
-		return 1;
-	}
+	struct game_Game game;
+	struct game_Options opts = {
+		.start_width = 640,
+		.start_height = 480,
+		.title = "Hello, world!"
+	};
+
+	game_Game_run(&game, opts);
+
     return 0;
 }
