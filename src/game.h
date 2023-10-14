@@ -4,26 +4,36 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdint.h>
-/* #include <GLFW/glfw3.h> */
+#include <GLFW/glfw3.h>
 
-/* TODO: should use size_t */
+#include "linalg.h"
+
+typedef uint32_t u32;
+typedef float f32;
+
 struct game_Model {
-	uint32_t vertices_count;
-	uint32_t indices_count;
-	float *vertices;
-	uint32_t *indices;
+	u32 vertices_count;
+	u32 indices_count;
+	f32 *vertices;
+	u32 *indices;
 };
 
 bool game_Model_load(const char *path, struct game_Model *out);
 
-/* struct game_Game {
-}; */
+struct game_Game {
+	GLFWwindow *window;
+};
+
+enum ActorEvent {
+	ACTOREVENT_TICK,
+	ACTOREVENT_DELETE,
+};
 
 struct game_Actor;
 struct game_Actor {
 	/* TODO transform */
-	/* TODO model*/
-	void (*handler)(struct game_Actor*);
+	u32 model_handle;
+	void (*handler)(struct game_Actor*, struct game_Game*, enum ActorEvent);
 	void *data;
 };
 

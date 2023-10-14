@@ -58,6 +58,58 @@ float linalg_Vec4_dot(struct linalg_Vec4 v0, struct linalg_Vec4 v1) {
 }
 
 /*
+ * Vec3 functions
+ */
+
+struct linalg_Vec3 linalg_Vec3_create(float x, float y, float z) {
+    struct linalg_Vec3 res;
+    res.x = x;
+    res.y = y;
+    res.z = z;
+    return res;
+}
+
+struct linalg_Vec3 linalg_Vec3_sub(struct linalg_Vec3 v0, struct linalg_Vec3 v1) {
+    struct linalg_Vec3 res;
+    res.x = v0.x - v1.x;
+    res.y = v0.y - v1.y;
+    res.z = v0.z - v1.z;
+    return res;
+}
+
+struct linalg_Vec3 linalg_Vec3_mul(struct linalg_Vec3 v, float k) {
+    struct linalg_Vec3 res;
+    res.x = v.x * k;
+    res.y = v.y * k;
+    res.z = v.z * k;
+    return res;
+}
+
+struct linalg_Vec3 linalg_Vec3_div(struct linalg_Vec3 v, float k) {
+    struct linalg_Vec3 res;
+    res.x = v.x / k;
+    res.y = v.y / k;
+    res.z = v.z / k;
+    return res;
+}
+
+float linalg_Vec3_mag(struct linalg_Vec3 v) {
+    return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+struct linalg_Vec3 linalg_Vec3_norm(struct linalg_Vec3 v) {
+    struct linalg_Vec3 res;
+    float mag;
+    res = v;
+    mag = linalg_Vec3_mag(v);
+    return linalg_Vec3_div(res, mag);
+}
+
+float linalg_Vec3_dot(struct linalg_Vec3 v0, struct linalg_Vec3 v1) {
+    return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
+}
+
+/*
  * Mat4x4 functions
  */
 
