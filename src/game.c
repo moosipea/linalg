@@ -68,7 +68,9 @@ static GLFWwindow *create_window(u32 width, u32 height, char *title) {
     return window;
 }
 
-static void cleanup_game(struct game_Game *game) { glfwTerminate(); }
+static void cleanup_game(struct game_Game *game) {
+	glfwTerminate();
+}
 
 static void debug_render() {
 	

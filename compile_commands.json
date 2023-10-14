@@ -1,0 +1,54 @@
+[
+ {
+  "directory": "/home/mattiasv/Programming/linalg",
+  "arguments": [
+   "gcc",
+   "-c",
+   "-Wall",
+   "-Wextra",
+   "-pedantic",
+   "-std=c99",
+   "-Isrc/glad/include",
+   "src/main.c"
+  ],
+  "file": "src/main.c"
+ },
+ {
+  "directory": "/home/mattiasv/Programming/linalg",
+  "arguments": [
+   "gcc",
+   "-c",
+   "-Wall",
+   "-Wextra",
+   "-pedantic",
+   "-std=c99",
+   "-Isrc/glad/include",
+   "src/game.c"
+  ],
+  "file": "src/game.c"
+ },
+ {
+  "directory": "/home/mattiasv/Programming/linalg",
+  "arguments": [
+   "gcc",
+   "-c",
+   "-Isrc/glad/include",
+   "src/glad/src/glad.c"
+  ],
+  "file": "src/glad/src/glad.c"
+ },
+ {
+  "directory": "/home/mattiasv/Programming/linalg",
+  "arguments": [
+   "gcc",
+   "-c",
+   "-Wall",
+   "-Wextra",
+   "-pedantic",
+   "-std=c99",
+   "-Isrc/glad/include",
+   "src/linalg.c"
+  ],
+  "file": "src/linalg.c"
+ }
+]
