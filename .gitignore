@@ -3,4 +3,5 @@ dependencies/
 .cache/
 compile_commands.json
 *.out
+*.exe
 *.o
