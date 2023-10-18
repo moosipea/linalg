@@ -67,16 +67,30 @@ static GLFWwindow *create_window(u32 width, u32 height, char *title) {
     return window;
 }
 
-static void cleanup_game(struct game_Game *_game) {
+static void cleanup_game(struct game_Game *game) {
+    (void) game;
 	glfwTerminate();
+}
+
+static void glfw_error_callback(i32 error, const char *desc) {
+    fprintf(stderr, "[GLFW ERROR] (%d): %s", error, desc);
+}
+
+static void glfw_key_callback(GLFWwindow *window, i32 key, i32 scancode, i32 action, i32 mods) {
+    (void) scancode;
+    (void) mods;
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
 int game_Game_run(struct game_Game *game, struct game_Options opts) {
 	if (!glfwInit())
 		PANIC("Failed to initialize GLFW");
 
+    glfwSetErrorCallback(glfw_error_callback);
     game->window = create_window(opts.start_width, opts.start_height, opts.title);
-	
+    glfwSetKeyCallback(game->window, glfw_key_callback);
+    
 	/* Initialize OpenGL */
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) 
 		PANIC("Failed to initialize GLAD");
@@ -90,16 +104,21 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
     free(vertex_src);
     free(fragment_src);
 
-	/* OpenGL begin */
-	float vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f,
-		 0.0f,  0.5f, 0.0f
-	};
+    f32 vertices[] = {
+        0.5f,  0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        -0.5f,  0.5f, 0.0f
+    };
 
-	u32 vbo;
+    u32 indices[] = {  
+        0, 1, 3,
+        1, 2, 3
+    };  
+
+	u32 vbo, ebo, vao;
 	glGenBuffers(1, &vbo);
-    u32 vao;
+    glGenBuffers(1, &ebo);
     glGenVertexArrays(1, &vao);
 
     glBindVertexArray(vao);
@@ -107,19 +126,23 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-	/* OpenGL end */
-
+    i32 width, height;
     while (!glfwWindowShouldClose(game->window)) {
-		glViewport(0, 0, opts.start_width, opts.start_height);
+        glfwGetFramebufferSize(game->window, &width, &height);
+		glViewport(0, 0, width, height);
         glClearColor(0.5f, 0.0f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        /* Test rendering */
         glUseProgram(program);
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         glfwSwapBuffers(game->window);
