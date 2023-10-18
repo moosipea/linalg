@@ -1,4 +1,5 @@
 #include "game.h"
+#include "shader.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -70,10 +71,6 @@ static void cleanup_game(struct game_Game *_game) {
 	glfwTerminate();
 }
 
-static void debug_render(void) {
-	
-}
-
 int game_Game_run(struct game_Game *game, struct game_Options opts) {
 	if (!glfwInit())
 		PANIC("Failed to initialize GLFW");
@@ -95,8 +92,20 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
 
 	u32 vbo;
 	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    u32 vao;
+    glGenVertexArrays(1, &vao);
+	
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    char *vertex_src = game_load_string("res/vertex.glsl");
+    char *fragment_src = game_load_string("res/fragment.glsl");
+    u32 program = game_Program_load(vertex_src, fragment_src);
+    free(vertex_src);
+    free(fragment_src);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
 	/* OpenGL end */
 
@@ -104,7 +113,11 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
 		glViewport(0, 0, opts.start_width, opts.start_height);
         glClearColor(0.5f, 0.0f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        debug_render();
+
+        glUseProgram(program);
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
         glfwSwapBuffers(game->window);
         glfwPollEvents();
     }

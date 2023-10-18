@@ -1,4 +1,5 @@
 #include "shader.h"
+#include "common.h"
 #include <stdio.h>
 
 static u32 create_shader(const char *src, u32 kind) {
@@ -13,9 +14,9 @@ static u32 create_shader(const char *src, u32 kind) {
     if (!success) {
         glGetShaderInfoLog(shader, 512, NULL, info_log);
         if (kind == GL_VERTEX_SHADER) {
-            PANIC("Vertex compilation failed: %s", info_log);
+            PANIC("Vertex shader compilation failed: %s", info_log);
         } else {
-            PANIC("Fragment compilation failed: %s", info_log);
+            PANIC("Fragment shader compilation failed: %s", info_log);
         }
     }
 
@@ -23,13 +24,19 @@ static u32 create_shader(const char *src, u32 kind) {
 }
 
 char *game_load_string(const char *path) {
-    FILE *fp = fopen(path, "r");
+    FILE *fp = fopen(path, "rb"); /* Apparently the b was important here? */
+
+    if (!fp) {
+        PANIC("Failed to open %s", path);
+    }
+
     fseek(fp, 0, SEEK_END);
-
     long length = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
 
-    char *buf = malloc(length * sizeof(char));
-    fread(buf, sizeof(char), length / sizeof(char), fp);
+    char *buf = malloc(length + 1);
+    buf[length] = '\0';
+    fread(buf, sizeof(char), length, fp);
 
     fclose(fp);
     return buf;
