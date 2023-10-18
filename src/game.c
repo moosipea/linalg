@@ -83,6 +83,13 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
 
     glfwSwapInterval(1);
 
+    /* Load shader program */ 
+    char *vertex_src = game_load_string("res/vertex.glsl");
+    char *fragment_src = game_load_string("res/fragment.glsl");
+    u32 program = game_Program_load(vertex_src, fragment_src);
+    free(vertex_src);
+    free(fragment_src);
+
 	/* OpenGL begin */
 	float vertices[] = {
 		-0.5f, -0.5f, 0.0f,
@@ -94,15 +101,11 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
 	glGenBuffers(1, &vbo);
     u32 vao;
     glGenVertexArrays(1, &vao);
-	
+
+    glBindVertexArray(vao);
+
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    char *vertex_src = game_load_string("res/vertex.glsl");
-    char *fragment_src = game_load_string("res/fragment.glsl");
-    u32 program = game_Program_load(vertex_src, fragment_src);
-    free(vertex_src);
-    free(fragment_src);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -117,6 +120,7 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
         glUseProgram(program);
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(0);
 
         glfwSwapBuffers(game->window);
         glfwPollEvents();
