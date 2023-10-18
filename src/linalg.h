@@ -14,7 +14,7 @@ struct linalg_Vec3 {
 };
 
 struct linalg_Mat4x4 {
-    float m[4][4];
+    float m[4 * 4];
 };
 
 /*

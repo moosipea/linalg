@@ -64,3 +64,8 @@ u32 game_Program_load(const char *vertex_src, const char *fragment_src) {
 
 	return program;
 }
+
+void game_Program_set_uniform_Mat4x4(game_Program program, const char *uniform_name, struct linalg_Mat4x4 *mat) {
+    i32 location = glGetUniformLocation(program, uniform_name);
+    glUniformMatrix4fv(location, 1, GL_FALSE, mat->m);
+}

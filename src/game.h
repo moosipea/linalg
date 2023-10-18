@@ -18,6 +18,7 @@ struct game_Model {
 };
 
 bool game_Model_load(const char *path, struct game_Model *out);
+u32 game_Model_upload(struct game_Model *model);
 void game_Model_kill(struct game_Model *model);
 
 struct game_Transform {

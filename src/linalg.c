@@ -113,64 +113,66 @@ float linalg_Vec3_dot(struct linalg_Vec3 v0, struct linalg_Vec3 v1) {
  * Mat4x4 functions
  */
 
+#define MATGET(m, y, x) m[y * 4 + x]
+
 struct linalg_Mat4x4 linalg_Mat4x4_ident(void) {
     struct linalg_Mat4x4 mat = {0};
-    mat.m[0][0] = 1.0f;
-    mat.m[1][1] = 1.0f;
-    mat.m[2][2] = 1.0f;
-    mat.m[3][3] = 1.0f;
+    MATGET(mat.m, 0, 0) = 1.0f;
+    MATGET(mat.m, 1, 1) = 1.0f;
+    MATGET(mat.m, 2, 2) = 1.0f;
+    MATGET(mat.m, 3, 3) = 1.0f;
     return mat;
 }
 
 void linalg_Mat4x4_matmul(struct linalg_Mat4x4 *with, struct linalg_Mat4x4 *mat) {
     for (int y = 0; y < 4; y++) {
         for (int x = 0; x < 4; x++) {
-            mat->m[y][x] = mat->m[y][0] * with->m[0][x] + mat->m[y][1] * with->m[1][x] +
-                           mat->m[y][2] * with->m[2][x] + mat->m[y][3] * with->m[3][x];
+            MATGET(mat->m, y, x) = MATGET(mat->m, y, 0) * MATGET(with->m, 0, x) + MATGET(mat->m, y, 1) * MATGET(with->m, 1, x) +
+                           MATGET(mat->m, y, 2) * MATGET(with->m, 2, x) + MATGET(mat->m, y, 3) * MATGET(with->m, 3, x);
         }
     }
 }
 
 struct linalg_Mat4x4 linalg_Mat4x4_translation(float dx, float dy, float dz) {
     struct linalg_Mat4x4 mat = linalg_Mat4x4_ident();
-    mat.m[0][3] = dx;
-    mat.m[1][3] = dy;
-    mat.m[2][3] = dz;
+    MATGET(mat.m, 0, 3) = dx;
+    MATGET(mat.m, 1, 3) = dy;
+    MATGET(mat.m, 2, 3) = dz;
     return mat;
 }
 
 struct linalg_Mat4x4 linalg_Mat4x4_scaling(float sx, float sy, float sz) {
     struct linalg_Mat4x4 mat = linalg_Mat4x4_ident();
-    mat.m[0][0] = sx;
-    mat.m[1][1] = sy;
-    mat.m[2][2] = sz;
+    MATGET(mat.m, 0, 0) = sx;
+    MATGET(mat.m, 1, 1) = sy;
+    MATGET(mat.m, 2, 2) = sz;
     return mat;
 }
 
 struct linalg_Mat4x4 linalg_Mat4x4_rotation_x(float r) {
     struct linalg_Mat4x4 mat = linalg_Mat4x4_ident();
-    mat.m[1][1] = cosf(r);
-    mat.m[1][2] = -sinf(r);
-    mat.m[2][1] = sinf(r);
-    mat.m[2][2] = cosf(r);
+    MATGET(mat.m, 1, 1) = cosf(r);
+    MATGET(mat.m, 1, 2) = -sinf(r);
+    MATGET(mat.m, 2, 1) = sinf(r);
+    MATGET(mat.m, 2, 2) = cosf(r);
     return mat;
 }
 
 struct linalg_Mat4x4 linalg_Mat4x4_rotation_y(float r) {
     struct linalg_Mat4x4 mat = linalg_Mat4x4_ident();
-    mat.m[0][0] = cosf(r);
-    mat.m[0][2] = sinf(r);
-    mat.m[2][0] = -sinf(r); 
-    mat.m[2][2] = cosf(r);
+    MATGET(mat.m, 0, 0) = cosf(r);
+    MATGET(mat.m, 0, 2) = sinf(r);
+    MATGET(mat.m, 2, 0) = -sinf(r); 
+    MATGET(mat.m, 2, 2) = cosf(r);
     return mat;
 }
 
 struct linalg_Mat4x4 linalg_Mat4x4_rotation_z(float r) {
     struct linalg_Mat4x4 mat = linalg_Mat4x4_ident();
-    mat.m[0][0] = cosf(r);
-    mat.m[0][1] = -sinf(r); 
-    mat.m[1][0] = sinf(r);
-    mat.m[1][1] = cosf(r);
+    MATGET(mat.m, 0, 0) = cosf(r);
+    MATGET(mat.m, 0, 1) = -sinf(r); 
+    MATGET(mat.m, 1, 0) = sinf(r);
+    MATGET(mat.m, 1, 1) = cosf(r);
     return mat;
 }
 
@@ -187,10 +189,10 @@ struct linalg_Mat4x4 linalg_Mat4x4_rotation(float rx, float ry, float rz) {
 struct linalg_Mat4x4 linalg_Mat4x4_perspective(float fov_y, float aspect, float near, float far) {
     struct linalg_Mat4x4 mat = linalg_Mat4x4_ident();
     float tan_half_fovy = tanf(fov_y / 2.0f);
-    mat.m[0][0] = 1.0f / (aspect * tan_half_fovy);
-    mat.m[1][1] = 1.0f / tan_half_fovy;
-    mat.m[2][2] = -(far + near) / (far - near);
-    mat.m[2][3] = 1.0f;
-    mat.m[3][2] = -(2.0f * far * near) / (far - near);
+    MATGET(mat.m, 0, 0) = 1.0f / (aspect * tan_half_fovy);
+    MATGET(mat.m, 1, 1) = 1.0f / tan_half_fovy;
+    MATGET(mat.m, 2, 2) = -(far + near) / (far - near);
+    MATGET(mat.m, 2, 3) = 1.0f;
+    MATGET(mat.m, 3, 2) = -(2.0f * far * near) / (far - near);
     return mat;
 }

@@ -47,6 +47,27 @@ bool game_Model_load(const char *path, struct game_Model *out) {
     return true;
 }
 
+u32 game_Model_upload(struct game_Model *model) {
+	u32 vbo, ebo, vao;
+	glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
+    glGenVertexArrays(1, &vao);   
+    
+    glBindVertexArray(vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, model->vertices_count * sizeof(f32), model->vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, model->indices_count * sizeof(u32), model->indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(f32), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+    return vao;
+}
+
 void game_Model_kill(struct game_Model *model) {
     free(model->vertices);
     free(model->indices);
@@ -83,6 +104,12 @@ static void glfw_key_callback(GLFWwindow *window, i32 key, i32 scancode, i32 act
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+static void draw_model(u32 vao, u32 count) {
+    glBindVertexArray(vao);
+    glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
 int game_Game_run(struct game_Game *game, struct game_Options opts) {
 	if (!glfwInit())
 		PANIC("Failed to initialize GLFW");
@@ -103,34 +130,12 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
     u32 program = game_Program_load(vertex_src, fragment_src);
     free(vertex_src);
     free(fragment_src);
+    
+    struct game_Model mdl;
+    if (!game_Model_load("res/cube.mdl", &mdl))
+        goto cleanup;
 
-    f32 vertices[] = {
-        0.5f,  0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        -0.5f,  0.5f, 0.0f
-    };
-
-    u32 indices[] = {  
-        0, 1, 3,
-        1, 2, 3
-    };  
-
-	u32 vbo, ebo, vao;
-	glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ebo);
-    glGenVertexArrays(1, &vao);
-
-    glBindVertexArray(vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    u32 vao = game_Model_upload(&mdl);
 
     i32 width, height;
     while (!glfwWindowShouldClose(game->window)) {
@@ -141,14 +146,13 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
 
         /* Test rendering */
         glUseProgram(program);
-        glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        draw_model(vao, 36); 
 
         glfwSwapBuffers(game->window);
         glfwPollEvents();
     }
 
+cleanup:
     cleanup_game(game);
 
     return EXIT_SUCCESS;
