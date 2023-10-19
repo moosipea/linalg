@@ -27,6 +27,8 @@ struct game_Transform {
 	struct linalg_Vec3 scaling;
 };
 
+struct linalg_Mat4x4 game_Transform_make_matrix(struct game_Transform transform);
+
 struct game_Options {
 	u32 start_width;
 	u32 start_height;

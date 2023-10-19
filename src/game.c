@@ -76,6 +76,16 @@ void game_Model_kill(struct game_Model *model) {
     free(model->indices);
 }
 
+
+struct linalg_Mat4x4 game_Transform_make_matrix(struct game_Transform transform) {
+    struct linalg_Mat4x4 scaling = linalg_Mat4x4_scaling(transform.scaling.x, transform.scaling.y, transform.scaling.z);
+    struct linalg_Mat4x4 rotation = linalg_Mat4x4_rotation(transform.rotation.x, transform.rotation.y, transform.rotation.z);
+    struct linalg_Mat4x4 translation = linalg_Mat4x4_translation(transform.translation.x, transform.translation.y, transform.translation.z);
+    linalg_Mat4x4_matmul(&rotation, &scaling);
+    linalg_Mat4x4_matmul(&translation, &scaling);
+    return scaling;
+}
+
 static GLFWwindow *create_window(u32 width, u32 height, char *title) {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
