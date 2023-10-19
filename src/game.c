@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
+
+#define DEG2RAD(deg) (deg * 3.14159f / 180.0f)
 
 #define MODEL_MAGIC 0x4C444D2E
 #define MODEL_INT_COUNT 5
@@ -134,22 +137,43 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
     free(vertex_src);
     free(fragment_src);
     
+    /*
     struct game_Model mdl;
     if (!game_Model_load("res/cube.mdl", &mdl))
         goto cleanup;
+    */
+
+    f32 vertices[] = {
+        -1, -1, 0,
+        -1, 1, 0,
+        1, 1, 0,
+        1, -1, 0
+    };
+
+    u32 indices[] = {
+        0, 1, 2,
+        0, 2, 3
+    };
+
+    struct game_Model mdl = {
+        .vertices = vertices,
+        .vertices_count = sizeof(vertices),
+        .indices = indices,
+        .indices_count = sizeof(indices)
+    };
 
     u32 vao = game_Model_upload(&mdl);
 
     f32 alpha = 0.0f;
-    struct linalg_Mat4x4 proj_mat = linalg_Mat4x4_perspective(1.5, (float)width/(float)height, 0.01f, 100.0f);
+    struct linalg_Mat4x4 proj_mat = linalg_Mat4x4_perspective(DEG2RAD(90.0f), (float)width/(float)height, 0.01f, 100.0f);
 
     while (!glfwWindowShouldClose(game->window)) {
         f32 dt = glfwGetTime();
         glfwSetTime(0);
 
         alpha += 1.0f * dt;
-        struct linalg_Mat4x4 mvp = linalg_Mat4x4_rotation_y(alpha);
-        struct linalg_Mat4x4 translation = linalg_Mat4x4_translation(0, 0, 1.0f);
+        struct linalg_Mat4x4 mvp = linalg_Mat4x4_rotation_z(alpha);
+        struct linalg_Mat4x4 translation = linalg_Mat4x4_scaling(0.5f, 0.5f, 0.5f);
 
         linalg_Mat4x4_matmul(&translation, &mvp);
         linalg_Mat4x4_matmul(&proj_mat, &mvp);
@@ -169,7 +193,6 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
         glfwPollEvents();
     }
 
-cleanup:
     cleanup_game(game);
 
     return EXIT_SUCCESS;
