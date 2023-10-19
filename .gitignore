@@ -1,4 +1,4 @@
-dependencies/
+depend/
 .ccls-cache/
 .cache/
 compile_commands.json

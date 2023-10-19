@@ -118,6 +118,9 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
     game->window = create_window(opts.start_width, opts.start_height, opts.title);
     glfwSetKeyCallback(game->window, glfw_key_callback);
     
+    i32 width = opts.start_width;
+    i32 height = opts.start_height;
+
 	/* Initialize OpenGL */
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) 
 		PANIC("Failed to initialize GLAD");
@@ -127,7 +130,7 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
     /* Load shader program */ 
     char *vertex_src = game_load_string("res/vertex.glsl");
     char *fragment_src = game_load_string("res/fragment.glsl");
-    u32 program = game_Program_load(vertex_src, fragment_src);
+    game_Program program = game_Program_load(vertex_src, fragment_src);
     free(vertex_src);
     free(fragment_src);
     
@@ -137,10 +140,24 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
 
     u32 vao = game_Model_upload(&mdl);
 
-    i32 width, height;
+    f32 alpha = 0.0f;
+    struct linalg_Mat4x4 proj_mat = linalg_Mat4x4_perspective(1.5, (float)width/(float)height, 0.01f, 100.0f);
+
     while (!glfwWindowShouldClose(game->window)) {
+        f32 dt = glfwGetTime();
+        glfwSetTime(0);
+
+        alpha += 1.0f * dt;
+        struct linalg_Mat4x4 mvp = linalg_Mat4x4_rotation_y(alpha);
+        struct linalg_Mat4x4 translation = linalg_Mat4x4_translation(0, 0, 1.0f);
+
+        linalg_Mat4x4_matmul(&translation, &mvp);
+        linalg_Mat4x4_matmul(&proj_mat, &mvp);
+        game_Program_set_uniform_Mat4x4(program, "main_matrix", &mvp);
+
         glfwGetFramebufferSize(game->window, &width, &height);
 		glViewport(0, 0, width, height);
+
         glClearColor(0.5f, 0.0f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
