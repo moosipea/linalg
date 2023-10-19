@@ -183,14 +183,14 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
 
         alpha += 1.0f * dt;
         struct game_Transform transform = {
-            .rotation = {0, 0, 0},
+            .rotation = {0, 0, alpha},
             .scaling = {1, 1, 1},
-            .translation = {sinf(alpha) / 2.0f, 0, 1}
+            .translation = {0, 0, 1}
         };
 
         struct linalg_Mat4x4 mvp = game_Transform_make_matrix(transform); 
         linalg_Mat4x4_matmul(&proj_mat, &mvp);
-        game_Program_set_uniform_Mat4x4(program, "main_matrix", &mvp);
+        game_Program_set_uniform_Mat4x4(program, "mvp", &mvp);
 
         glfwGetFramebufferSize(game->window, &width, &height);
 		glViewport(0, 0, width, height);

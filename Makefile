@@ -43,7 +43,6 @@ $(DEPENDENICES)/glfw:
 run: $(PROGRAM)
 	./$(PROGRAM)
 
-
 .PHONY: clean
 clean:
 	rm -f *.o
