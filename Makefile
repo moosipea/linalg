@@ -9,8 +9,10 @@ INCLUDES := -I$(SOURCES)/glad/include -I$(DEPENDENICES)/glfw/include
 LIBPATH := -L$(DEPENDENICES)/glfw/src
 LIBS := -lglfw3 -lgdi32 -lopengl32
 
-a.out: $(GLFW_LIB) main.o game.o linalg.o shader.o glad.o
-	$(CC) main.o game.o linalg.o shader.o glad.o $(LIBPATH) $(LIBS)
+PROGRAM := game.exe
+
+$(PROGRAM): $(GLFW_LIB) main.o game.o linalg.o shader.o glad.o
+	$(CC) -o $(PROGRAM) main.o game.o linalg.o shader.o glad.o $(LIBPATH) $(LIBS)
 
 main.o: $(SOURCES)/main.c
 	$(CC) -c $(CFLAGS) $(INCLUDES) $(SOURCES)/main.c
@@ -36,6 +38,11 @@ $(GLFW_LIB): $(DEPENDENICES)/glfw
 
 $(DEPENDENICES)/glfw:
 	git clone --depth=1 https://github.com/glfw/glfw.git $(DEPENDENICES)/glfw
+
+.PHONY: run
+run: $(PROGRAM)
+	./$(PROGRAM)
+
 
 .PHONY: clean
 clean:

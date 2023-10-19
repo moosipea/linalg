@@ -107,7 +107,7 @@ static void cleanup_game(struct game_Game *game) {
 }
 
 static void glfw_error_callback(i32 error, const char *desc) {
-    fprintf(stderr, "[GLFW ERROR] (%d): %s", error, desc);
+    fprintf(stderr, "[GLFW ERROR] (%d): %s\n", error, desc);
 }
 
 static void glfw_key_callback(GLFWwindow *window, i32 key, i32 scancode, i32 action, i32 mods) {
@@ -182,10 +182,13 @@ int game_Game_run(struct game_Game *game, struct game_Options opts) {
         glfwSetTime(0);
 
         alpha += 1.0f * dt;
-        struct linalg_Mat4x4 mvp = linalg_Mat4x4_rotation_z(alpha);
-        struct linalg_Mat4x4 translation = linalg_Mat4x4_scaling(0.5f, 0.5f, 0.5f);
+        struct game_Transform transform = {
+            .rotation = {0, 0, 0},
+            .scaling = {1, 1, 1},
+            .translation = {sinf(alpha) / 2.0f, 0, 1}
+        };
 
-        linalg_Mat4x4_matmul(&translation, &mvp);
+        struct linalg_Mat4x4 mvp = game_Transform_make_matrix(transform); 
         linalg_Mat4x4_matmul(&proj_mat, &mvp);
         game_Program_set_uniform_Mat4x4(program, "main_matrix", &mvp);
 
